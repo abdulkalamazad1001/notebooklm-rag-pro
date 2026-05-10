@@ -17,7 +17,7 @@ export function NotebookApp() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   return (
-    <div className="flex h-dvh flex-col bg-zinc-950 text-zinc-100 selection:bg-zinc-100 selection:text-zinc-900 overflow-hidden font-sans">
+    <div className="flex h-dvh flex-col bg-zinc-950 text-zinc-100 selection:bg-zinc-100 selection:text-zinc-900 overflow-hidden font-sans bg-glow">
       {/* Top Header - Glassmorphism */}
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-white/5 bg-zinc-950/80 backdrop-blur-md px-4 z-50">
         <div className="flex items-center gap-3">
