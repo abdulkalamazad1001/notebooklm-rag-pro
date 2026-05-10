@@ -21,7 +21,7 @@ export function ChatMessageItem({ message }: Props) {
 
   return (
     <div className={cn(
-      "group relative flex flex-col gap-4 transition-all duration-500",
+      "group relative flex flex-col gap-4 animate-message",
       isUser ? "items-end" : "items-start"
     )}>
       <div

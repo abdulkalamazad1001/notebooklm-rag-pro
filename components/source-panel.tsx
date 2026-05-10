@@ -93,8 +93,9 @@ export function SourcePanel({ notebook, onUploaded, onClear }: Props) {
               }}
             />
             {isUploading ? (
-              <div className="flex flex-col items-center gap-4">
-                <div className="relative">
+              <div className="flex flex-col items-center gap-4 relative overflow-hidden w-full h-full">
+                <div className="absolute inset-0 bg-blue-500/5 animate-scan pointer-events-none border-t border-blue-500/20" />
+                <div className="relative mt-10">
                   <div className="absolute inset-0 blur-xl bg-blue-500/20 animate-pulse" />
                   <Loader2 className="h-10 w-10 animate-spin text-blue-400 relative" />
                 </div>

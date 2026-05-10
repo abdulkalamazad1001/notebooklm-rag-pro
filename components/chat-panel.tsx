@@ -291,11 +291,11 @@ function EmptyState({
   onPick: (prompt: string) => void
 }) {
   return (
-    <div className="flex h-full flex-col items-center justify-center text-center animate-in fade-in zoom-in duration-700">
-      <div className="relative mb-6 group">
-        <div className="absolute inset-0 bg-blue-500/20 blur-3xl rounded-full group-hover:bg-blue-500/30 transition-all duration-500" />
-        <div className="relative flex h-16 w-16 items-center justify-center rounded-[2rem] bg-zinc-900 border border-white/10 shadow-2xl transition-transform duration-500 group-hover:scale-105">
-          <Brain className="h-8 w-8 text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
+    <div className="flex h-full flex-col items-center justify-center text-center pb-20 overflow-hidden">
+      <div className="relative mb-8 group animate-float">
+        <div className="absolute inset-0 bg-blue-500/20 blur-3xl rounded-full group-hover:bg-blue-500/30 transition-all duration-500 animate-pulse-glow" />
+        <div className="relative flex h-20 w-20 items-center justify-center rounded-[2.5rem] bg-zinc-900 border border-white/10 shadow-2xl transition-transform duration-500 group-hover:scale-105">
+          <Brain className="h-10 w-10 text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]" />
         </div>
       </div>
       
