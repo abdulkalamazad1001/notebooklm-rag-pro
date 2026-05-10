@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { ArrowRight, Sparkles, Square } from "lucide-react"
+import { ArrowRight, Brain, Square, MessageSquare, Terminal, Cpu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ChatMessageItem } from "@/components/chat-message"
 import { cn } from "@/lib/utils"
@@ -69,7 +69,7 @@ export function ChatPanel({ notebook }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           notebookId: notebook.id,
-          notebook: notebook, // Send the full notebook including chunks for stateless deploy
+          notebook: notebook,
           messages: [
             ...messages.map((m) => ({ role: m.role, content: m.content })),
             { role: "user", content: text },
@@ -132,7 +132,6 @@ export function ChatPanel({ notebook }: Props) {
         }
       }
 
-      // Final flush
       setMessages((prev) =>
         prev.map((m) =>
           m.id === assistantId
@@ -175,24 +174,28 @@ export function ChatPanel({ notebook }: Props) {
   }
 
   return (
-    <section className="flex h-full min-h-0 flex-col bg-background">
-      <header className="flex items-center justify-between border-b border-border px-4 py-3">
-        <div className="flex items-center gap-2 text-sm font-medium">
-          <MessageSquareIcon className="h-4 w-4 text-muted-foreground" />
-          Chat
+    <section className="flex h-full min-h-0 flex-col bg-transparent">
+      {/* Dynamic Header with Blur */}
+      <header className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-zinc-950/20 backdrop-blur-sm">
+        <div className="flex items-center gap-3 text-sm font-bold tracking-tight">
+          <div className="p-1.5 rounded bg-zinc-800/50 border border-white/5">
+            <MessageSquare className="h-4 w-4 text-zinc-400" />
+          </div>
+          Intelligence Session
           {notebook && (
-            <span className="text-muted-foreground font-normal hidden sm:inline">
-              Asking questions about {notebook.name}
+            <span className="text-zinc-500 font-medium hidden sm:inline px-2 py-0.5 rounded bg-white/5 border border-white/5 text-[10px] uppercase tracking-widest ml-2">
+              Context: {notebook.name}
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2 rounded-md border border-border bg-card px-2.5 py-1 text-[10px] text-muted-foreground">
-          <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-          llama-3.1-70b
+        <div className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-zinc-900 border border-white/10 text-[9px] font-black uppercase tracking-tighter text-zinc-400">
+           <Cpu className="h-2.5 w-2.5 text-blue-500" />
+           Llama-3.1-70B
         </div>
       </header>
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+      {/* Message Area */}
+      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-10 custom-scrollbar">
         {messages.length === 0 ? (
           <EmptyState
             disabled={!notebook}
@@ -202,7 +205,7 @@ export function ChatPanel({ notebook }: Props) {
             }}
           />
         ) : (
-          <div className="mx-auto flex max-w-3xl flex-col gap-6">
+          <div className="mx-auto flex max-w-4xl flex-col gap-10">
             {messages.map((m) => (
               <ChatMessageItem key={m.id} message={m} />
             ))}
@@ -210,50 +213,70 @@ export function ChatPanel({ notebook }: Props) {
         )}
       </div>
 
-      <div className="border-t border-border p-4">
-        <form onSubmit={onSubmit} className="mx-auto max-w-3xl">
+      {/* Input Area - Glassmorphism */}
+      <div className="p-6 bg-gradient-to-t from-zinc-950 to-transparent">
+        <form onSubmit={onSubmit} className="mx-auto max-w-3xl relative">
           <div
             className={cn(
-              "flex items-center rounded-xl border border-border bg-card px-4 py-2.5 shadow-lg shadow-black/40 transition-all focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/40",
-              !notebook && "opacity-60",
+              "group relative flex flex-col rounded-2xl border border-white/10 bg-zinc-900/80 backdrop-blur-xl p-2 shadow-2xl transition-all duration-300 focus-within:border-white/20 focus-within:shadow-[0_0_30px_rgba(255,255,255,0.05)]",
+              !notebook && "opacity-60 grayscale",
             )}
           >
-            <input
+            <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  onSubmit(e);
+                }
+              }}
               disabled={!notebook}
               placeholder={
                 notebook
-                  ? "Ask anything about your document..."
-                  : "Upload a document in the sidebar first"
+                  ? "Describe your query or ask for a summary..."
+                  : "Sync a document to start analysis"
               }
-              className="flex-1 bg-transparent px-2 text-sm outline-none disabled:cursor-not-allowed"
+              rows={2}
+              className="w-full bg-transparent p-3 text-sm text-zinc-100 placeholder:text-zinc-600 outline-none resize-none min-h-[60px] max-h-[200px]"
             />
-            {isStreaming ? (
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={stop}
-              >
-                <Square className="h-3.5 w-3.5" />
-              </Button>
-            ) : (
-              <Button
-                type="submit"
-                variant="secondary"
-                size="icon"
-                disabled={!notebook || !input.trim()}
-                className="h-8 w-8"
-              >
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Button>
-            )}
+            
+            <div className="flex items-center justify-between px-3 pb-2">
+               <div className="flex gap-2">
+                  <div className="text-[10px] text-zinc-500 flex items-center gap-1">
+                    <Terminal className="h-3 w-3" />
+                    Markdown Supported
+                  </div>
+               </div>
+               <div className="flex items-center gap-2">
+                  {isStreaming ? (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20"
+                      onClick={stop}
+                    >
+                      <Square className="h-3 w-3 mr-2 fill-current" />
+                      Stop
+                    </Button>
+                  ) : (
+                    <Button
+                      type="submit"
+                      disabled={!notebook || !input.trim()}
+                      size="sm"
+                      className="h-8 rounded-lg bg-zinc-100 text-zinc-900 hover:bg-white hover:scale-105 active:scale-95 transition-all shadow-lg"
+                    >
+                      Analyze
+                      <ArrowRight className="h-3.5 w-3.5 ml-2" />
+                    </Button>
+                  )}
+               </div>
+            </div>
           </div>
-          <div className="mt-2 text-center text-[10px] text-muted-foreground">
-            Answers are grounded in retrieved excerpts and may still contain mistakes.
-          </div>
+          <p className="mt-3 text-center text-[10px] text-zinc-600 font-medium">
+            Responses are derived from document context.
+          </p>
         </form>
       </div>
     </section>
@@ -268,16 +291,19 @@ function EmptyState({
   onPick: (prompt: string) => void
 }) {
   return (
-    <div className="flex h-full flex-col items-center justify-center text-center">
-      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-        <Sparkles className="h-6 w-6" />
+    <div className="flex h-full flex-col items-center justify-center text-center animate-in fade-in zoom-in duration-700">
+      <div className="relative mb-6 group">
+        <div className="absolute inset-0 bg-blue-500/20 blur-3xl rounded-full group-hover:bg-blue-500/30 transition-all duration-500" />
+        <div className="relative flex h-16 w-16 items-center justify-center rounded-[2rem] bg-zinc-900 border border-white/10 shadow-2xl transition-transform duration-500 group-hover:scale-105">
+          <Brain className="h-8 w-8 text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
+        </div>
       </div>
-      <h3 className="mb-2 text-lg font-semibold tracking-tight">
-        Ready to dive in?
+      
+      <h3 className="mb-2 text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-zinc-500">
+        Intelligence Awaits.
       </h3>
-      <p className="mb-8 max-w-sm text-sm text-muted-foreground">
-        Upload a PDF or text file to get started. You can ask for summaries,
-        clarifications, or deep dives into specific topics.
+      <p className="mb-8 max-w-sm text-[13px] text-zinc-500 leading-relaxed font-medium">
+        Synchronize your research documents to begin a high-fidelity dialogue powered by advanced semantic retrieval.
       </p>
 
       <div className="grid w-full max-w-lg grid-cols-1 gap-2 sm:grid-cols-2">
@@ -287,32 +313,13 @@ function EmptyState({
             type="button"
             disabled={disabled}
             onClick={() => onPick(p)}
-            className="flex items-center justify-between rounded-lg border border-border bg-card p-3 text-left text-xs transition-colors hover:bg-muted/50 disabled:cursor-not-allowed disabled:opacity-50"
+            className="group flex items-center justify-between rounded-xl border border-white/5 bg-zinc-900/50 p-4 text-left text-xs font-medium text-zinc-400 transition-all hover:bg-white/5 hover:border-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
           >
             <span className="line-clamp-1">{p}</span>
-            <ArrowRight className="h-3 w-3 shrink-0 text-muted-foreground" />
+            <ArrowRight className="h-4 w-4 shrink-0 -translate-x-2 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
           </button>
         ))}
       </div>
     </div>
-  )
-}
-
-function MessageSquareIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-    </svg>
   )
 }
