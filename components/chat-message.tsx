@@ -69,8 +69,8 @@ export function ChatMessageItem({ message }: Props) {
             <div className={cn(
               "whitespace-pre-wrap text-pretty",
               isUser 
-                ? "font-sans text-[13px] font-semibold tracking-tight leading-snug" 
-                : "font-serif text-[16px] md:text-[17px] leading-[1.65] tracking-tight text-zinc-200"
+                ? "font-sans text-[14px] font-medium tracking-tight leading-relaxed" 
+                : "font-serif text-[15px] md:text-[16px] leading-[1.7] tracking-normal text-zinc-200"
             )}>
               {rendered}
             </div>
